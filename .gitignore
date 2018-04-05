@@ -1,0 +1,9 @@
+/target/
+build
+script/*
+*.log
+*.iml
+.project
+.settings
+.idea/*
+*.properties

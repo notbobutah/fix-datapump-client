@@ -1,0 +1,382 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FIX DataPump Client</title>
+
+</head>
+<h1>Restful Async stream service test....</h1><br>
+<div id='secdiv'>
+    <label for="username">Security Username</label>
+    <input type="text" id="username" value="rmackay" ></input><br>
+    <label for="password">Security Password</label>
+    <input type="text" id="password" value="rmackay" ></input><br>
+    <button onclick="login();"/>Login</button><br>
+    <label for="cookie">Security Token</label>
+    <input type="text" id="token" value="Authorization : Bearer" width="400"></input><br>
+    <label for="cookie">Security Cookie</label>
+    <input type="text" id="cookie" value="Cookie: JSESSION" width="400"></input><br>
+</div>
+<label for="symname">Symbol Pair</label>
+<input type="text" id="symname" value="AUDEUR"></input>
+<select id='symsel'></select><button onclick="symbollist();"/>SymbolList</button><br>
+<label for="volume">Volume List</label>
+<input type="text" id="volume" value="1000000,2000000,5000000,10000000"></input><br>
+<label for="nearvolume">Near Volume Amount</label>
+<input type="text" id="nearvolume" value="1000000"></input><br>
+<label for="farvolume">Far Volume Amount</label>
+<input type="text" id="farvolume" value="2000000"></input><br>
+<label for="tenor">Tenor</label>
+<input type="text" id="tenor" value="2000000"></input><br>
+<br><input type="text" id="lplist" value="GS,JPMC,BAML"></input><select id='brokersel'></select><button onclick="brokerlist();"/>BrokerList</button><br>
+<button onclick="symbolfullamount();"/>full amount</button>
+<button onclick="symbolquote();"/>RFS Quote</button>
+<button onclick="symbolquote();"/>RFS Forward</button>
+<button onclick="testEnd();"/>test end</button>
+<button onclick="emittertest();"/>test emitter</button>
+<!--GET /api/v1/fxdataserver/quote/{account}/{symbol}/{provider}/{currency}/{tenor}/{qtynear}/{qtyfar}/{amount}/{action}-->
+<div id='contentdiv'>
+
+</div>
+<script>
+    //        var hostandport = "https://10.2.0.65:30921";
+    var hostandport = "";
+    function S4() {
+        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    }
+    var emitid = newEmitid();
+    function newEmitid() {
+        // then to call it, plus stitch in '4' in the third group
+        emitid = (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
+        return emitid
+    }
+    var putbody = {
+        "agglist": true,
+        "depthofbook": 10,
+        "emitterykey": newEmitid(),
+        "id": "123456",
+        "providers": [ "JPMC", "GS" ],
+        "symbolPair": "AUD/EUR",
+        "timeout": 0
+    };
+
+    var fxEvents = null;
+    function testEnd() {
+        fxEvents.close();
+//            fxEvents = new EventSource('/v1/api/fx/symbols/close/'+emitid+'/');
+        console.log("Inside testEnd - streaming from "+ emitid);
+    }
+
+    function symbollist() {
+        var ssel = document.getElementById('symsel');
+        var locemitid = newEmitid();
+        console.log("Inside symbollist: "+ locemitid);
+
+        fxEvents = new EventSource('/api/v1/fx/symbols/'+ locemitid);
+        console.log("Inside symbollist event listener setup");
+        var data = event.data;
+
+        fxEvents.addEventListener("message", function (event) {
+            var symdivloc = document.createElement("option");
+            console.log("Inside symbollist event listener callback: " + event.data);
+            var pdata = JSON.parse(event.data);
+            symdivloc.innerText = pdata.symbol;
+            ssel.appendChild(symdivloc);
+        });
+    }
+    function brokerlist() {
+        var bsel = document.getElementById('brokersel');
+        var locemitid = newEmitid();
+        console.log("Inside brokerlist: "+ locemitid);
+
+        fxEvents = new EventSource('/api/v1/fx/providers/'+ "8009_1234");
+        console.log("Inside brokerlist event listener setup");
+        var data = event.data;
+        //            var pdata = JSON.parse(event.data);
+
+        fxEvents.addEventListener("message", function (event) {
+            var brodivloc = document.createElement("option");
+            console.log("Inside brokerlist listener callback: " + event.data);
+            var pdata = JSON.parse(event.data);
+            brodivloc.innerText = pdata.broker;
+            bsel.appendChild(brodivloc);
+        });
+    }
+
+    function symbolquote() {
+        var cdiv = document.getElementById('contentdiv');
+        var symnamestr = document.getElementById('symname').value;
+        var locemitid = newEmitid();
+        console.log("Inside symbolquote:"+symnamestr + " - " + locemitid);
+        var urlstr = '/api/v1/fx/quote/' + locemitid +'/' + symnamestr +'/SP/' + 1000000 + "/BAML,GS,JPMC/0/";
+        fxEvents = new EventSource(urlstr);
+
+        console.log("Inside symbollist event listener setup");
+        var data = event.data;
+        fxEvents.addEventListener("message", function (event) {
+            cdiv.innerHTML = '<br>';
+//                console.log("Inside event listener callback: " + event.data);
+            var div = document.createElement("div");
+            div.style.width = "100%";
+            div.style.border = "1";
+            div.style.background = "white";
+            div.style.color = "blue";
+
+            var quotetbl = document.createElement("table");
+            var tbdy = document.createElement('tbody');
+            quotetbl.appendChild(tbdy);
+            quotetbl.style.borderWidth = "thick";
+
+            var data = event.data;
+            var pdata = JSON.parse(event.data);
+            var quote = pdata.Quote;
+
+//                div.innerHTML = data;
+
+            for (var key in quote)
+            {
+                var tr = document.createElement('tr');
+                console.log("parsing json : " + JSON.stringify(quote[key]));
+                var bid = quote[key].BID;
+                var ask = quote[key].OFFER;
+                console.log("parsing json bid: " + JSON.stringify(bid));
+                console.log("parsing json ask: " + JSON.stringify(ask));
+
+                if(bid){
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML = "BID";
+                    tr.append(bidtd);
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML=quote[key].BID.provider;
+                    tr.append(bidtd);
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML=quote[key].BID.volume;
+                    tr.append(bidtd);
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML=quote[key].BID.price;
+                    tr.append(bidtd);
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML=quote[key].BID.mdorderid;
+                    tr.append(bidtd);
+
+                }
+                if(ask){
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML="Offer";
+                    tr.append(asktd);
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML=quote[key].OFFER.provider;
+                    tr.append(asktd);
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML=quote[key].OFFER.volume;
+                    tr.append(asktd);
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML=quote[key].OFFER.price;
+                    tr.append(asktd);
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML=quote[key].OFFER.mdorderid;
+                    tr.append(asktd);
+                }
+
+                tbdy.appendChild(tr);
+            }
+
+            div.appendChild(quotetbl);
+            cdiv.appendChild(div);
+
+        });
+    }
+
+    function symbolfullamount() {
+        var cdiv = document.getElementById('contentdiv');
+        var symnamestr = document.getElementById('symname').value;
+        var volstr = document.getElementById('volume').value;
+        var lpstr = document.getElementById('lplist').value;
+        var locemitid = newEmitid();
+        console.log("Inside symboltest:"+symnamestr + " - " + locemitid);
+
+        cdiv.innerHTML = '<br>';
+        var urlstr = hostandport + '/api/v1/fx/symbols/' + locemitid +'/' + symnamestr +'/' + 1 + "/"+lpstr+"/"+volstr+"/0/";
+        // /v1/api/fx/symbols/43123434/AUDEUR/5/GS%2CJPMC%2CBAML/100000%2C200000%2C500000%2C10000000/0/'
+        fxEvents = new EventSource(urlstr);
+        console.log("Inside event listener setup");
+
+        fxEvents.addEventListener("message", function (event) {
+            var cdiv = document.getElementById('contentdiv');
+            cdiv.innerHTML = '';
+            console.log("Inside event listener callback: " + event.data);
+            var div = document.createElement("div");
+            div.setAttribute("id", "qtdiv");
+            div.style.width = "100%";
+            div.style.border = "1";
+//                div.style.height = "100px";
+            div.style.background = "white";
+            div.style.color = "blue";
+
+            var quotetbl = document.createElement("table");
+            var tbdy = document.createElement('tbody');
+
+            var data = event.data;
+            var pdata = JSON.parse(event.data);
+            var quote = pdata.Quote;
+
+//                div.innerHTML = data;
+
+            for (var key in quote)
+            {
+                console.log("data count : " + key);
+                var tr = document.createElement('tr');
+                console.log("parsing json : " + JSON.stringify(quote[key]));
+                var bid = quote[key].BID;
+                var ask = quote[key].OFFER;
+
+                if(bid){
+                    console.log("parsing json bid: " + JSON.stringify(bid));
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML = "BID";
+                    tr.append(bidtd);
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML=quote[key].BID.provider;
+                    tr.append(bidtd);
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML=quote[key].BID.volume;
+                    tr.append(bidtd);
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML=quote[key].BID.price;
+                    tr.append(bidtd);
+//                        var bidtd = document.createElement('td');
+//                        bidtd.innerHTML=quote[key].BID.mdorderid;
+//                        tr.append(bidtd);
+                }
+                if(ask){
+                    console.log("parsing json ask: " + JSON.stringify(ask));
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML="Offer";
+                    tr.append(asktd);
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML=quote[key].OFFER.provider;
+                    tr.append(asktd);
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML=quote[key].OFFER.volume;
+                    tr.append(asktd);
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML=quote[key].OFFER.price;
+                    tr.append(asktd);
+//                        var asktd = document.createElement('td');
+//                        asktd.innerHTML=quote[key].OFFER.mdorderid;
+//                        tr.append(asktd);
+                }
+
+                tbdy.appendChild(tr);
+            }
+
+            cdiv.innerHTML = '';
+            quotetbl.appendChild(tbdy);
+            quotetbl.style.borderWidth = "thick";
+            div.appendChild(quotetbl);
+            cdiv.appendChild(div);
+        });
+
+        fxEvents.addEventListener('open', function (e) { }, false);
+
+        fxEvents.addEventListener('error', function (e) {
+            testEnd();
+        }, false);
+    }
+    function symboltest() {
+        var cdiv = document.getElementById('contentdiv');
+        var symnamestr = document.getElementById('symname').value;
+        var lplst = document.getElementById('lplist').value;
+        var locemitid = newEmitid();
+        console.log("Inside symboltest:"+symnamestr + " - " + locemitid);
+
+        cdiv.innerHTML = '<br>';
+        var urlstr = hostandport +  '/api/v1/fx/symbols/' + locemitid +'/' + symnamestr +'/' + 8 + "/"+lplst+"/" + 0 + "/";
+        // /v1/api/fx/symbols/43123434/AUDEUR/5/GS%2CJPMC%2CBAML/100000%2C200000%2C500000%2C10000000/0/'
+        fxEvents = new EventSource(urlstr);
+        console.log("Inside event listener setup");
+
+        fxEvents.addEventListener("message", function (event) {
+            cdiv.innerHTML = '<br>';
+            console.log("Inside event listener callback: " + event.data);
+            var div = document.createElement("div");
+            div.style.width = "100%";
+            div.style.border = "1";
+//                div.style.height = "100px";
+            div.style.background = "white";
+            div.style.color = "blue";
+
+            var quotetbl = document.createElement("table");
+            var tbdy = document.createElement('tbody');
+            quotetbl.appendChild(tbdy);
+            quotetbl.style.borderWidth = "thick";
+
+            var data = event.data;
+            var pdata = JSON.parse(event.data);
+            var quote = pdata.Quote;
+
+//                div.innerHTML = data;
+
+            for (var key in quote)
+            {
+                var tr = document.createElement('tr');
+                console.log("parsing json : " + JSON.stringify(quote[key]));
+                var bid = quote[key].BID;
+                var ask = quote[key].OFFER;
+                console.log("parsing json bid: " + JSON.stringify(bid));
+                console.log("parsing json ask: " + JSON.stringify(ask));
+
+                if(bid){
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML = "BID";
+                    tr.append(bidtd);
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML=quote[key].BID.provider;
+                    tr.append(bidtd);
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML=quote[key].BID.volume;
+                    tr.append(bidtd);
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML=quote[key].BID.price;
+                    tr.append(bidtd);
+                    var bidtd = document.createElement('td');
+                    bidtd.innerHTML=quote[key].BID.mdorderid;
+                    tr.append(bidtd);
+                }
+                if(ask){
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML="Offer";
+                    tr.append(asktd);
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML=quote[key].OFFER.provider;
+                    tr.append(asktd);
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML=quote[key].OFFER.volume;
+                    tr.append(asktd);
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML=quote[key].OFFER.price;
+                    tr.append(asktd);
+                    var asktd = document.createElement('td');
+                    asktd.innerHTML=quote[key].OFFER.mdorderid;
+                    tr.append(asktd);
+                }
+
+                tbdy.appendChild(tr);
+            }
+
+            div.appendChild(quotetbl);
+            cdiv.appendChild(div);
+
+        });
+
+        fxEvents.addEventListener('open', function (e) { }, false);
+
+        fxEvents.addEventListener('error', function (e) {
+            testEnd();
+        }, false);
+    }
+</script>
+</body>
+</html>

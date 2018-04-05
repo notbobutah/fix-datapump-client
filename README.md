@@ -1,0 +1,1 @@
+# FX Data Pump client## HTTP2 streaming data service for FX symbolsThis project connects to the fix datapoump and submits FSS specific FIX reuests to support load testing the streaming code### This project uses the following libraries:* SpringFox Swagger * QuickfixJ FIX engine and client* Neovest Data project

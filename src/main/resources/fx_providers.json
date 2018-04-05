@@ -1,0 +1,16 @@
+{"Providers": [
+    {"code": "BAML", "title": "Bank of America" },
+    {"code": "BNP", "title": "BNP Paribas"},
+    {"code": "BTMU", "title": "Bank of Tokyo-Mitsubishi UFJ"},
+    {"code": "CITI", "title": "Citi"},
+    {"code": "COBA", "title": "CommerzBank"},
+    {"code": "CS", "title": "Credit Suisse"},
+    {"code": "GS", "title": "Goldman Sachs"},
+    {"code": "HSBC", "title": "HSBC" },
+    {"code": "JPMC", "title": "JPMorgan Chase"},
+    {"code": "MS", "title": "Morgan Stanley" },
+    {"code": "SCB", "title": "Standard Chartered"},
+    {"code": "UBS", "title": "UBS"}
+  ]
+  }
+

@@ -1,0 +1,40 @@
+{"Providers": [
+    {"code": "BAML", "title": "Bank of America", "tenors":
+    ["TOD","TOM","SP","SNX","W1","W2","W3","M1","M2","M3","M4","M5","M6","M9","Y1","M15","M18","Y2","Y3","Y4","Y5","IM1","IM2","IM3","IM4"]
+    },
+    {"code": "BNP", "title": "BNP Paribas", "tenors":
+    ["TOD","TOM","SP","SNX","W1","W2","W3","M1","M2","M3","M4","M5","M6","M7","M8","M9","M10","M11","Y1","M15","M18","M21","Y2"]
+    },
+    {"code": "BTMU", "title": "Bank of Tokyo-Mitsubishi UFJ", "tenors":
+    ["SP"]
+    },
+    {"code": "CITI", "title": "Citi", "tenors":
+    ["TOD","TOM","SP","SNX","W1","W2","W3","M1","M2","M3","M6","M9","Y1","IM1","IM2","IM3","IM4"]
+    },
+    {"code": "COBA", "title": "CommerzBank", "tenors":
+    ["TOD","TOM","SP","SNX","W1","W2","W3","M1","M2","M3","M4","M5","M6","M7","M8","M9","M10","M11","Y1","M15","M18","M21","Y2"]
+    },
+    {"code": "CS", "title": "Credit Suisse", "tenors":
+    ["TOD","TOM","SP","SNX","W1","W2","W3","M1","M2","M3","M4","M5","M6","M9","Y1","M15","M18","Y2"]
+    },
+    {"code": "GS", "title": "Goldman Sachs", "tenors":
+    ["SP","SNX","W1","W2","W3","M1","M2","M3","M4","M5","M6","M7","M8","M9","M10","M11","Y1","M15","M18","M21","Y2","Y3","Y4","Y5","Y6","Y7","Y8","Y9","Y10","Y15","Y20","Y25","Y30","IM1","IM2"]
+    },
+    {"code": "HSBC", "title": "HSBC", "tenors":
+    ["TOD","TOM","SP","SNX","W1","W2","W3","M1","M2","M3","M4","M5","M6","M7","M8","M9","M10","M11","Y1"]
+    },
+    {"code": "JPMC", "title": "JPMorgan Chase", "tenors":
+    ["TOD","TOM","SP","SNX","W1","W2","W3","M1","M2","M3","M4","M5","M6","M7","M8","M9","M10","M11","Y1","Y2","Y3","Y4","Y5","Y6","Y7","Y8","Y9","Y10","","IM1","IM2","IM3","IM4"]
+    },
+    {"code": "MS", "title": "Morgan Stanley", "tenors":
+    ["TOD","TOM","SP","SNX","D2","D3","D4","W1","W2","W3","M1","M2","M3","M4","M5","M6","M7","M8","M9","M10","M11","Y1","M15","M18","M21","Y2","Y3","Y4","Y5","Y6","Y7","Y8","Y9","Y10","Y15","Y20","Y25","Y30","IM1","IM2","IM3","IM4"]
+    },
+    {"code": "SCB", "title": "Standard Chartered", "tenors":
+    ["TOD","TOM","SP","SNX","W1","W2","W3","M1","M2","M3","M4","M5","M6","M7","M8","M9","M10","M11","Y1","M15","M18","M21","Y2"]
+    },
+    {"code": "UBS", "title": "UBS", "tenors":
+    ["TOD","TOM","SP","SNX","D2","D3","D4","W1","W2","W3","M1","M2","M3","M4","M5","M6","M7","M8","M9","M10","M11","Y1","M15","M18","M21","Y2","Y3","Y4","Y5","Y6","Y7","Y8","Y9","Y10","Y15","Y20","Y25","Y30","IM1","IM2","IM3","IM4"]
+    }
+  ]
+  }
+
